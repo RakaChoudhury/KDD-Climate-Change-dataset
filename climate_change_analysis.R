@@ -208,6 +208,7 @@ ggplot(MeanTemperature, aes(x = Year, y = avg_Temp)) + geom_smooth(model = lm,si
   ggtitle("Average Temperature Trend") + 
   theme(plot.title = element_text(size = 13, lineheight=.8, face="bold")) 
 
+#Applying k-means clustering algorithm with k=3
 k.means<-kmeans(MeanTemperature,3)
 k.means
 
@@ -225,3 +226,31 @@ ggplot(MeanTemperature, aes(x = Year, y = avg_Temp)) + geom_smooth(model = lm,si
   annotate("text",x =1992.000, y = 20,label = "1964-2012")+
   geom_vline(xintercept = 1932,lty=2,size = 1, color = "green")+
   geom_vline(xintercept = 1963,lty=2,size = 1, color = "green")
+
+#Applying time series ARIMA model
+GlobalLandTemperaturesByMajorCity <- read_csv("GlobalLandTemperaturesByMajorCity.csv",col_types = cols(dt = col_date(format = "%Y-%m-%d")))
+#time series part
+GlobalLandTemperaturesByMajorCityByMoth<-subset(GlobalLandTemperaturesByMajorCity,dt> "1989-12-01")
+MeanTemperatureByMonth = GlobalLandTemperaturesByMajorCityByMoth  %>%
+  separate(col = dt, into = c("Year", "Month", "Day"), convert = TRUE) %>%
+  group_by(Year, Month) %>%
+  summarise(avg_Temp = mean(AverageTemperature)) #summarise the mean of the temperature as avg_Temp
+#omit the lines with missing value
+
+MeanTemperatureByMonth<-na.omit(MeanTemperatureByMonth)
+MeanTemperatureByMonth <- MeanTemperatureByMonth[,3]
+
+summary(MeanTemperatureByMonth)
+dim(MeanTemperatureByMonth)
+
+
+MeanTemperatureByMonth<-ts(MeanTemperatureByMonth,start=c(1990,1), fre=12)
+MeanTemperatureByMonth
+
+boxplot(MeanTemperatureByMonth~cycle(MeanTemperatureByMonth))
+
+training<-ts(MeanTemperatureByMonth,start=c(1990,1),end=c(2010,12), fre=12)
+training
+test<-ts(MeanTemperatureByMonth,start=c(2011,1),end=c(2013,8), fre=12)
+test
+plot(training,ylab='MeanTemperatureByMonth')
