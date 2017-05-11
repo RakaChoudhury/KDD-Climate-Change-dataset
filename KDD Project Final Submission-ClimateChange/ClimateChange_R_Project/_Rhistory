@@ -1,0 +1,512 @@
+names(usa)
+summary(usa)
+usa.mreg.out2 <- lm(usa$forestarea ~usa$co2emission+usa$poptot)
+summary(usa.mreg.out2)
+usa.mreg.int2 <- predict(usa.mreg.out2,
+data.frame(usa$co2emission,usa$poptot),
+interval = "confidence");
+usa$forestarea[1:30]<-usa.mreg.int2[1:30,1]
+usa.mreg.out4 <- lm(usa$co2emission ~ usa$forestarea+usa$poptot)
+summary(usa.mreg.out4)
+temperature.ucba <- read.csv("temperature_uscanbra.csv",header = TRUE,sep = ",")
+temperature.aens <- read.csv("temperature_egysouth.csv",header = TRUE,sep = ",")
+temperature.icmp <- read.csv("temperature_indiachina.csv",header = TRUE,sep = ",")
+usaTemp <-c(1960:2012)
+brazilTemp <- c(1960:2012)
+canadaTemp <- c(1960:2012)
+for (i in 1960:2012) {
+usaTemp[i-1959] <- mean(temperature.ucba[temperature.ucba$Country == "USA" & temperature.ucba$X.Year == i,]$Temperature..C.)
+brazilTemp[i-1959] <- mean(temperature.ucba[temperature.ucba$Country == "BRA" & temperature.ucba$X.Year == i,]$Temperature..C.)
+canadaTemp[i-1959] <- mean(temperature.ucba[temperature.ucba$Country == "CAN" & temperature.ucba$X.Year == i,]$Temperature..C.)
+}
+egyptTemp <- c(1960:2012)
+southafricaTemp <- c(1960:2012)
+for (i in 1960:2012) {
+egyptTemp[i-1959] <- mean(temperature.aens[temperature.aens$Country == "EGY" & temperature.aens$X.Year == i,]$Temperature..C.)
+southafricaTemp[i-1959] <- mean(temperature.aens[temperature.aens$Country == "ZAF" & temperature.aens$X.Year == i,]$Temperature..C.)
+}
+chinaTemp <-c(1960:2012)
+indiaTemp <- c(1960:2012)
+for (i in 1960:2012) {
+chinaTemp[i-1959] <- mean(temperature.icmp[temperature.icmp$Country == "CHN" & temperature.icmp$Year == i,]$Temperature)
+indiaTemp[i-1959] <- mean(temperature.icmp[temperature.icmp$Country == "IND" & temperature.icmp$Year == i,]$Temperature)
+}
+usaTraining <- cbind(usa[1:53,],usaTemp)
+names(usaTraining)[5]<-"temperature"
+braTraining <- cbind(brazil[1:53,],brazilTemp)
+names(braTraining)[5]<-"temperature"
+canTraining<-cbind(canada[1:53,],canadaTemp)
+names(canTraining)[5]<-"temperature"
+usaTraining$country <- "USA"
+braTraining$country <- "BRA"
+canTraining$country <- "CAN"
+chinaTraining<-cbind(china[1:53,],chinaTemp)
+indiaTraining<-cbind(india[1:53,],indiaTemp)
+colnames(chinaTraining)[5]<-"temperature"
+colnames(indiaTraining)[5]<-"temperature"
+chinaTraining$country<-"CHN"
+indiaTraining$country<-"IND"
+egypttraining<-cbind(egypt[1:53,],egyptTemp)
+egypttraining$country <- "EGY"
+names(egypttraining)[5] <- "temperature"
+southafricatraining<-cbind(southafrica[1:53,],southafricaTemp)
+southafricatraining$country<- "RSA"
+names(southafricatraining)[5]<-"temperature"
+climateData <- rbind(usaTraining,canTraining,braTraining)
+climateData <- rbind(climateData,chinaTraining,indiaTraining)
+climateData <- rbind(climateData,egypttraining,southafricatraining)
+climateData.norm<-climateData
+mmnorm.forestarea <- (climateData$forestarea - min(climateData$forestarea))/(max(climateData$forestarea) - min(climateData$forestarea))
+climateData.norm$forestarea <- mmnorm.forestarea
+mmnorm.co2emission <-(climateData$co2emission - min(climateData$co2emission))/(max(climateData$co2emission) - min(climateData$co2emission))
+climateData.norm$co2emission <- mmnorm.co2emission
+climateData
+climateData.norm
+View(climateData.norm)
+climateData <- rbind(usaTraining,canTraining,braTraining)
+climateData <- rbind(climateData,chinaTraining,indiaTraining)
+climateData <- rbind(climateData,egypttraining,southafricatraining)
+climateData.norm<-climateData
+mmnorm.forestarea <- (climateData$forestarea - min(climateData$forestarea))/(max(climateData$forestarea) - min(climateData$forestarea))
+climateData.norm$forestarea <- mmnorm.forestarea
+mmnorm.co2emission <-(climateData$co2emission - min(climateData$co2emission))/(max(climateData$co2emission) - min(climateData$co2emission))
+climateData.norm$co2emission <- mmnorm.co2emission
+mmnorm.poptot <-(climateData$poptot - min(climateData$poptot))/(max(climateData$poptot) - min(climateData$poptot))
+climateData.norm$poptot <- mmnorm.poptot
+climateData.norm
+usa.initial <- read.csv("usa.csv",header = TRUE,sep = ",")
+names(usa.initial)<-c("year","forestarea","co2emission","poptot")
+str(usa)
+usa <- usa.initial
+names(usa)
+summary(usa)
+summary(usa.mreg.out2)
+usa.mreg.out2 <- lm(usa$forestarea ~usa$co2emission+usa$poptot)
+usa.mreg.int2 <- predict(usa.mreg.out2,
+data.frame(usa$co2emission,usa$poptot),
+interval = "confidence");
+usa$forestarea[1:30]<-usa.mreg.int2[1:30,1]
+usa.mreg.out4 <- lm(usa$co2emission ~ usa$forestarea+usa$poptot)
+summary(usa.mreg.out4)
+usa.mreg.int4 <- predict(usa.mreg.out4,
+data.frame(usa$forestarea,usa$poptot),
+interval = "confidence");
+usa$co2emission[c(53:56)]<-usa.mreg.int4[c(53:56),1]
+brazil.initial <-read.csv("brazil.csv",header = TRUE,sep = ",")
+names(brazil.initial)<-c("year","forestarea","co2emission","poptot")
+brazil.reg.out5 <- lm(brazil$co2emission ~brazil$forestarea+brazil$poptot)
+brazil <- brazil.initial
+summary(brazil.reg.out5)
+brazil.reg.int5 <- predict(brazil.reg.out5,
+data.frame(brazil$forestarea,brazil$poptot),
+interval = "confidence");
+brazil$co2emission[c(53:56)]<-brazil.reg.int5[c(53:56),1]
+brazil.reg.out2 <- lm(brazil$forestarea ~brazil$co2emission+brazil$poptot)
+summary(brazil.reg.out2)
+brazil.reg.int2 <- predict(brazil.reg.out2,
+data.frame(brazil$co2emission,brazil$poptot),
+interval = "confidence");
+brazil$forestarea[1:30]<-brazil.reg.int2[1:30,1]
+canada.initial<-read.csv("canada.csv",header = TRUE,sep = ",")
+names(canada.initial)<-c("year","forestarea","co2emission","poptot")
+canada <- canada.initial
+canada.mreg.out2 <- lm(canada$forestarea ~canada$co2emission+canada$poptot)
+summary(canada.mreg.out2)
+canada.mreg.int2 <- predict(canada.mreg.out2,
+data.frame(canada$co2emission,canada$poptot),
+interval = "confidence");
+canada$forestarea[1:30]<-canada.mreg.int2[1:30,1]
+canada.mreg.out4 <- lm(canada$co2emission ~canada$forestarea+canada$poptot)
+summary(canada.mreg.out4)
+canada.mreg.int4 <- predict(canada.mreg.out4,
+data.frame(canada$forestarea,canada$poptot),
+interval = "confidence");
+canada$co2emission[c(53:56)]<-canada.mreg.int4[c(53:56),1]
+india.initial<- read.csv("india.csv",header= TRUE,sep = ",")
+india<-india.initial[-56,]
+india.mreg.out2<- lm(india$forestarea~india$co2emission
++india$poptot)
+india.mreg.int2 <- predict(india.mreg.out2,
+data.frame(india$co2emission,
+india$poptot),
+interval = "confidence");
+india$forestarea[2:30]<-india.mreg.int2[2:30,1]
+india.mreg.out4<- lm(india$co2emission~india$forestarea+india$poptot)
+india.mreg.int4 <- predict(india.mreg.out4,
+data.frame(india$forestarea,india$poptot),
+interval = "confidence");
+india$co2emission[53:55]<-india.mreg.int4[53:55,1]
+india.mreg.out5<- lm(india$forestarea~india$co2emission
++india$poptot)
+india.mreg.int5 <- predict(india.mreg.out5,
+data.frame(india$forestarea,india$co2emission,
+india$poptot),
+interval = "confidence");
+india$forestarea[1]<-india.mreg.int5[1,1]
+china.initial<- read.csv("china.csv",header= TRUE,sep = ",")
+china<-china.initial[-56,]
+chn.mreg.out2<- lm(china$forestarea~china$co2emission
++china$poptot)
+chn.mreg.int2 <- predict(chn.mreg.out2,
+data.frame(china$co2emission,
+china$poptot),
+interval = "confidence");
+china$forestarea[2:30]<-chn.mreg.int2[2:30,1]
+chn.mreg.out4<- lm(china$co2emission~china$forestarea+china$poptot)
+chn.mreg.int4 <- predict(chn.mreg.out4,
+data.frame(china$forestarea,china$poptot),
+interval = "confidence");
+china$co2emission[53:55]<-chn.mreg.int4[53:55,1]
+chn.mreg.out5<- lm(china$forestarea~china$co2emission
++china$poptot)
+chn.mreg.int5 <- predict(chn.mreg.out5,
+data.frame(china$forestarea,china$co2emission,
+china$poptot),
+interval = "confidence");
+china$forestarea[1]<-chn.mreg.int5[1,1]
+southafrica.initial<- read.csv("southafrica.csv",header= TRUE,sep = ",")
+southafrica<-southafrica.initial
+mreg.out.s4 <- lm(southafrica$forestarea ~southafrica$co2emission+southafrica$poptot)
+summary(mreg.out.s4)
+mreg.int.s4 <- predict(mreg.out.s4,
+data.frame(southafrica$co2emission,southafrica$poptot),
+interval = "confidence");
+southafrica$forestarea[1:30]<-mreg.int.s4[1:30,1]
+mreg.out.s6 <- lm(southafrica$co2emission ~southafrica$forestarea+southafrica$poptot)
+summary(mreg.out.s6)
+mreg.int.s6 <- predict(mreg.out.s6,
+data.frame(southafrica$forestarea,southafrica$poptot),
+interval = "confidence");
+southafrica$co2emission[c(53:56)]<-mreg.int.s6[c(53:56),1]
+egypt.initial<- read.csv("egypt.csv",header= TRUE,sep = ",")
+egypt<-egypt.initial
+mreg.out.e4 <- lm(egypt$forestarea ~egypt$co2emission+egypt$poptot)
+summary(mreg.out.e4)
+mreg.int.e4 <- predict(mreg.out.e4,
+data.frame(egypt$co2emission,egypt$poptot),
+interval = "confidence");
+egypt$forestarea[1:30]<-mreg.int.e4[1:30,1]
+mreg.out.e6 <- lm(egypt$co2emission ~egypt$forestarea+egypt$poptot)
+summary(mreg.out.e6)
+mreg.int.e6 <- predict(mreg.out.e6,
+data.frame(egypt$forestarea,egypt$poptot),
+interval = "confidence");
+egypt$co2emission[c(53:56)]<-mreg.int.e6[c(53:56),1]
+temperature.ucba <- read.csv("temperature_uscanbra.csv",header = TRUE,sep = ",")
+temperature.aens <- read.csv("temperature_egysouth.csv",header = TRUE,sep = ",")
+temperature.icmp <- read.csv("temperature_indiachina.csv",header = TRUE,sep = ",")
+usaTemp <-c(1960:2012)
+brazilTemp <- c(1960:2012)
+canadaTemp <- c(1960:2012)
+for (i in 1960:2012) {
+usaTemp[i-1959] <- mean(temperature.ucba[temperature.ucba$Country == "USA" & temperature.ucba$X.Year == i,]$Temperature..C.)
+brazilTemp[i-1959] <- mean(temperature.ucba[temperature.ucba$Country == "BRA" & temperature.ucba$X.Year == i,]$Temperature..C.)
+canadaTemp[i-1959] <- mean(temperature.ucba[temperature.ucba$Country == "CAN" & temperature.ucba$X.Year == i,]$Temperature..C.)
+}
+egyptTemp <- c(1960:2012)
+southafricaTemp <- c(1960:2012)
+for (i in 1960:2012) {
+egyptTemp[i-1959] <- mean(temperature.aens[temperature.aens$Country == "EGY" & temperature.aens$X.Year == i,]$Temperature..C.)
+southafricaTemp[i-1959] <- mean(temperature.aens[temperature.aens$Country == "ZAF" & temperature.aens$X.Year == i,]$Temperature..C.)
+}
+chinaTemp <-c(1960:2012)
+indiaTemp <- c(1960:2012)
+for (i in 1960:2012) {
+chinaTemp[i-1959] <- mean(temperature.icmp[temperature.icmp$Country == "CHN" & temperature.icmp$Year == i,]$Temperature)
+indiaTemp[i-1959] <- mean(temperature.icmp[temperature.icmp$Country == "IND" & temperature.icmp$Year == i,]$Temperature)
+}
+usaTraining <- cbind(usa[1:53,],usaTemp)
+names(usaTraining)[5]<-"temperature"
+braTraining <- cbind(brazil[1:53,],brazilTemp)
+names(braTraining)[5]<-"temperature"
+canTraining<-cbind(canada[1:53,],canadaTemp)
+names(canTraining)[5]<-"temperature"
+usaTraining$country <- "USA"
+braTraining$country <- "BRA"
+canTraining$country <- "CAN"
+chinaTraining<-cbind(china[1:53,],chinaTemp)
+indiaTraining<-cbind(india[1:53,],indiaTemp)
+colnames(chinaTraining)[5]<-"temperature"
+colnames(indiaTraining)[5]<-"temperature"
+chinaTraining$country<-"CHN"
+indiaTraining$country<-"IND"
+egypttraining<-cbind(egypt[1:53,],egyptTemp)
+egypttraining$country <- "EGY"
+names(egypttraining)[5] <- "temperature"
+southafricatraining<-cbind(southafrica[1:53,],southafricaTemp)
+southafricatraining$country<- "RSA"
+names(southafricatraining)[5]<-"temperature"
+climateData <- rbind(usaTraining,canTraining,braTraining)
+climateData <- rbind(climateData,chinaTraining,indiaTraining)
+climateData <- rbind(climateData,egypttraining,southafricatraining)
+climateData.norm<-climateData
+mmnorm.forestarea <- (climateData$forestarea - min(climateData$forestarea))/(max(climateData$forestarea) - min(climateData$forestarea))
+climateData.norm
+climateData.norm<-climateData
+mmnorm.forestarea <- (climateData$forestarea - min(climateData$forestarea))/(max(climateData$forestarea) - min(climateData$forestarea))
+climateData.norm$forestarea <- mmnorm.forestarea
+mmnorm.co2emission <-(climateData$co2emission - min(climateData$co2emission))/(max(climateData$co2emission) - min(climateData$co2emission))
+climateData.norm$co2emission <- mmnorm.co2emission
+mmnorm.poptot <-(climateData$poptot - min(climateData$poptot))/(max(climateData$poptot) - min(climateData$poptot))
+climateData.norm$poptot <- mmnorm.poptot
+#---------------------------------------------------------------------------------------------
+#Initially the country which is non numeric value is set to zero before calculating corelation matrix
+egypttraining$country<-NULL
+cor(egypttraining)
+egypttraining$country<-"EGY"
+#plotting all the plots for which correlation > |.80|
+plot(egypttraining$forestarea,egypttraining$poptot)
+plot(egypttraining$forestarea,egypttraining$co2emission)
+#-------------------------------------------------------------------------------------------------
+#Initially the country which is non numeric value is set to zero before calculating corelation matrix
+southafricatraining$country<-NULL
+cor(southafricatraining)
+southafricatraining$country<-"RSA"
+#plotting all the plots for which correlation > |.80|
+plot(southafricatraining$forestarea,southafricatraining$co2emission)
+-----------------------------------------------------------------------------------------------------
+#Initially the country which is non numeric value is set to zero before calculating corelation matrix
+braTraining$country<-NULL
+cor(braTraining)
+braTraining$country<-"BRA"
+plot(braTraining$forestarea,braTraining$poptot)
+plot(braTraining$co2emission,braTraining$poptot)
+plot(braTraining$forestarea,braTraining$co2emission)
+----------------------------------------------------------------------------------------------------
+#Initially the country which is non numeric value is set to zero before calculating corelation matrix
+canTraining$country<-NULL
+cor(canTraining)
+canTraining$country<-"CAN"
+plot(canTraining$forestarea,canTraining$poptot)
+#---------------------------------------------------------------------------------------------------
+#Initially the country which is non numeric value is set to zero before calculating corelation matrix
+usaTraining$country<-NULL
+cor(usaTraining)
+usaTraining$country<-"USA"
+plot(usaTraining$forestarea,usaTraining$poptot)
+#-------------------------------------------------------------------------------------------------------
+#Initially the country which is non numeric value is set to zero before calculating corelation matrix
+indiaTraining$country<-NULL
+cor(indiaTraining)
+indiaTraining$country<-"IND"
+plot(indiaTraining$forestarea,indiaTraining$poptot)
+plot(indiaTraining$co2emission,indiaTraining$poptot)
+plot(indiaTraining$forestarea,indiaTraining$co2emission)
+#-------------------------------------------------------------------------------------------------------------
+#Initially the country which is non numeric value is set to zero before calculating corelation matrix
+chinaTraining$country<-NULL
+cor(chinaTraining)
+chinaTraining$country<-"CHN"
+plot(chinaTraining$forestarea,chinaTraining$poptot)
+plot(chinaTraining$co2emission,chinaTraining$poptot)
+plot(chinaTraining$forestarea,chinaTraining$co2emission)
+climateData <- rbind(usaTraining,canTraining,braTraining)
+climateData <- rbind(climateData,chinaTraining,indiaTraining)
+climateData <- rbind(climateData,egypttraining,southafricatraining)
+climateData.norm<-climateData
+climateData.norm
+climateData.norm<-climateData
+mmnorm.forestarea <- (climateData$forestarea - min(climateData$forestarea))/(max(climateData$forestarea) - min(climateData$forestarea))
+climateData.norm$forestarea <- mmnorm.forestarea
+mmnorm.co2emission <-(climateData$co2emission - min(climateData$co2emission))/(max(climateData$co2emission) - min(climateData$co2emission))
+climateData.norm$co2emission <- mmnorm.co2emission
+mmnorm.poptot <-(climateData$poptot - min(climateData$poptot))/(max(climateData$poptot) - min(climateData$poptot))
+climateData.norm$poptot <- mmnorm.poptot
+climateData.norm
+library(cluster)
+climateclusters <- kmeans(climateData.norm$temperature, centers = 3)
+whichbin <- climateclusters$cluster;
+bin1<- rownames(climateData.norm[ climateclusters$cluster==1,])
+bin2 <- rownames(climateData.norm[ climateclusters$cluster==2,])
+bin3 <- rownames(climateData.norm[ climateclusters$cluster==3,])
+bin1meantemp <- mean(climateData.norm$temperature[which(rownames(climateData.norm) %in% bin1)])
+bin2meantemp <- mean(climateData.norm$temperature[which(rownames(climateData.norm) %in% bin2)])
+bin3meantemp <- mean(climateData.norm$temperature[which(rownames(climateData.norm) %in% bin3)])
+tempCat <- c("-1", "-1","-1")
+maxMean <- max(bin1meantemp,bin2meantemp,bin3meantemp)
+minMean <- min(bin1meantemp,bin2meantemp,bin3meantemp)
+if(bin1meantemp == maxMean){
+tempCat[1]="HIGH"
+}else if(bin1meantemp == minMean){
+tempCat[1]="LOW"}else{
+tempCat[1]="MEDIUM"
+}
+if(bin2meantemp == maxMean){
+tempCat[2]="HIGH"
+}else if(bin2meantemp == minMean){
+tempCat[2]="LOW"}else{
+tempCat[2]="MEDIUM"
+}
+if(bin3meantemp == maxMean){
+tempCat[3]="HIGH"
+}else if(bin3meantemp == minMean){
+tempCat[3]="LOW"}else{
+tempCat[3]="MEDIUM"
+}
+climateclusters
+for(i in 1:nrow(climateData.norm)){
+if(whichbin[i]==1){
+climateData.norm$tempCat[i] <- tempCat[1]
+}
+else if(whichbin[i]==2){
+climateData.norm$tempCat[i] <- tempCat[2]
+}
+else if(whichbin[i]==3){
+climateData.norm$tempCat[i] <- tempCat[3]
+}
+}
+plotcluster(climateData.norm$temperature,climateclusters$cluster)
+library(fpc)
+plotcluster(climateData.norm$temperature,climateclusters$cluster)
+library(rpart)
+library(rpart.plot)
+data_rand <- climateData.norm[order(runif(371)), ] #creating  a new dataframe
+summary(climateData.norm$temperature)
+summary(data_rand$temperature) # we check that we get the same data in both dataframes...
+head(climateData.norm$temperature)
+head(data_rand$temperature) # we check the order of both dataframes are different !
+prop.table(table(data_train$tempCat))
+prop.table(table(data_test$tempCat))
+data_model_cart<-rpart(tempCat ~ forestarea+co2emission+poptot+temperature,
+method="class", data = data_train)
+printcp(data_model_cart) # display the results
+plotcp(data_model_cart) # visualize cross-validation results
+summary(data_model_cart) # detailed summary of splits
+plot(data_model_cart, uniform=TRUE,
+main="Classification Tree for Climate Data")
+text(data_model_cart, use.n=TRUE, all=TRUE, cex=.8)
+rpart.plot(data_model_cart)
+x<-data_train[,c(2,3,4,5)]
+y<-data_train$tempCat
+y<-as.factor(y)
+library(C50)
+data_model_c50 <- C5.0(x,y)
+data_model_c50
+summary(data_model_c50)
+data_predict_c50 <- predict(data_model_c50,data_test)
+library(gmodels)
+CrossTable(data_test$tempCat, data_predict_c50,
+prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE,
+dnn = c('actual ', 'predicted '))
+data_predict_cart <- predict(data_model_cart,data_test)
+x<-data_train[,c(2,3,4,5)]
+y<-data_train$tempCat
+y<-as.factor(y)
+library(C50)
+data_model_c50 <- C5.0(x,y)
+data_model_c50
+summary(data_model_c50)
+data_model_c50_01<- C5.0(data_train[,c(2,3,4)],as.factor(data_train$tempCat))
+summary(data_model_c50_01)
+CrossTable(data_test$tempCat, data_predict_c50,
+prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE,
+dnn = c('actual ', 'predicted '))
+data_predict_c50_01<- predict(data_model_c50_01,data_test)
+CrossTable(data_test$tempCat, data_predict_c50_01,
+prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE,
+dnn = c('actual ', 'predicted '))
+GlobalLandTemperaturesByMajorCity <- read_csv("D:/R workspace/kdd project/GlobalLandTemperatures/GlobalLandTemperaturesByMajorCity.csv",col_types = cols(dt = col_date(format = "%Y-%m-%d")))
+View(GlobalLandTemperaturesByMajorCity)
+pMiss <- function(x){sum(is.na(x))/length(x)*100}
+apply(GlobalLandTemperaturesByMajorCity,2,pMiss)
+apply(GlobalLandTemperaturesByMajorCity,1,pMiss)
+GlobalLandTemperaturesByMajorCity <- read_csv("GlobalLandTemperaturesByMajorCity.csv",col_types = cols(dt = col_date(format = "%Y-%m-%d")))
+library(readr)
+GlobalLandTemperaturesByMajorCity <- read_csv("GlobalLandTemperaturesByMajorCity.csv",col_types = cols(dt = col_date(format = "%Y-%m-%d")))
+View(GlobalLandTemperaturesByMajorCity)
+pMiss <- function(x){sum(is.na(x))/length(x)*100}
+apply(GlobalLandTemperaturesByMajorCity,2,pMiss)
+apply(GlobalLandTemperaturesByMajorCity,1,pMiss)
+library(mice)
+md.pattern(GlobalLandTemperaturesByMajorCity)
+sapply(GlobalLandTemperaturesByMajorCity, function(x) sum(is.na(x)))
+MajorCity <- subset(GlobalLandTemperaturesByMajorCity, dt> "1900-12-01" & dt < "2013-09-01")
+View(MajorCity)
+summary(MajorCity)
+library(moments)
+install.packages("moments")
+library(moments)
+skewness(MajorCity$AverageTemperature)
+plot(skewness(MajorCity$AverageTemperature))
+library(e1071)
+install.packages("e1071")
+library(e1071)
+kurtosis(MajorCity$AverageTemperature)
+hist(MajorCity$AverageTemperature, breaks=11,xlim=c(-30,50), main="Histogram of Average Temperature",xlab="Temperature(in deg.C)",ylab="Counts")
+library(dplyr)
+MajorCity$year <- format(MajorCity$dt, "%Y")
+m <- data.frame(MajorCity$year ,MajorCity$AverageTemperature , MajorCity$AverageTemperatureUncertainty)
+View(m)
+aggdata <- aggregate(m, list(m$MajorCity.year), FUN = mean)
+print(aggdata)
+mean(MajorCity$AverageTemperature)
+mean.test <- t.test(x=MajorCity$AverageTemperature, mu=19.0129, conf.level= 0.95)
+mean.test$statistic
+mean.test$p.value
+mean.test$conf.int
+box <- boxplot(GlobalLandTemperaturesByMajorCity$AverageTemperature, main = "Checking for outliers in temperature")
+box$out    #outlier values
+names(box)
+box$stats    #Shows trend in outliers
+View(GlobalTemperatures)
+GlobalTemperatures$dt<- format(GlobalTemperatures$dt, "%Y-%m-%d")
+g <- subset(GlobalTemperatures, dt> "1752-12-01")
+g$year <- format(g$dt, "%Y")
+gc()
+library(readr)
+library(tidyr)
+library(dplyr)
+library(data.table)
+library(ggplot2)
+library(readxl)
+library(TSA)
+library(forecast)
+library(readxl)
+GlobalLandTemperaturesByMajorCity <- read_csv("GlobalLandTemperaturesByMajorCity.csv",col_types = cols(dt = col_date(format = "%Y-%m-%d")))
+MeanTemperature = GlobalLandTemperaturesByMajorCity  %>%
+separate(col = dt, into = c("Year", "Month", "Day"), convert = TRUE) %>%
+group_by(Year) %>%
+summarise(avg_Temp = mean(AverageTemperature)) #summarise the mean of the temperature as avg_Temp
+MeanTemperature<-na.omit(MeanTemperature)
+MeanTemperature<-MeanTemperature[MeanTemperature$Year>=1889,]
+MeanTemperature
+summary(MeanTemperature)
+dim(MeanTemperature)
+ggplot(MeanTemperature, aes(x = Year, y = avg_Temp)) + geom_smooth(model = lm,size = 2) +
+xlab("Years") + ylab("Average Temperature") +
+theme(axis.title = element_text(size = 15), axis.text = element_text(size = 13)) +
+ggtitle("Average Temperature Trend") +
+theme(plot.title = element_text(size = 13, lineheight=.8, face="bold"))
+k.means<-kmeans(MeanTemperature,3)
+k.means
+ggplot(MeanTemperature, aes(x = Year, y = avg_Temp)) + geom_smooth(model = lm,size = 2) +
+xlab("Years") + ylab("Average Temperature") +
+theme(axis.title = element_text(size = 15), axis.text = element_text(size = 13)) +
+ggtitle("Average Temperature Trend") +
+theme(plot.title = element_text(size = 13, lineheight=.8, face="bold")) +
+geom_point(x = 1911.325, y = 18.61164,size = 3, color = "red")+
+annotate("text",x =1909.383 , y = 20,label = "1989-1931")+
+geom_point(x = 1952.000, y = 18.93435,size = 3, color = "red") +
+annotate("text",x =1948 , y = 20,label = "1932-1963")+
+geom_point(x = 1992.500, y = 19.37075,size = 3, color = "red") +
+annotate("text",x =1992.000, y = 20,label = "1964-2012")+
+geom_vline(xintercept = 1932,lty=2,size = 1, color = "green")+
+geom_vline(xintercept = 1963,lty=2,size = 1, color = "green")
+MeanTemperatureByMonth = GlobalLandTemperaturesByMajorCityByMoth  %>%
+separate(col = dt, into = c("Year", "Month", "Day"), convert = TRUE) %>%
+group_by(Year, Month) %>%
+summarise(avg_Temp = mean(AverageTemperature)) #summarise the mean of the temperature as avg_Temp
+GlobalLandTemperaturesByMajorCityByMoth<-subset(GlobalLandTemperaturesByMajorCity,dt> "1989-12-01")
+GlobalLandTemperaturesByMajorCity <- read_csv("GlobalLandTemperaturesByMajorCity.csv",col_types = cols(dt = col_date(format = "%Y-%m-%d")))
+MeanTemperatureByMonth<-na.omit(MeanTemperatureByMonth)
+MeanTemperatureByMonth <- MeanTemperatureByMonth[,3]
+summary(MeanTemperatureByMonth)
+dim(MeanTemperatureByMonth)
+MeanTemperatureByMonth<-ts(MeanTemperatureByMonth,start=c(1990,1), fre=12)
+MeanTemperatureByMonth
+boxplot(MeanTemperatureByMonth~cycle(MeanTemperatureByMonth))
+training<-ts(MeanTemperatureByMonth,start=c(1990,1),end=c(2010,12), fre=12)
+training
+test<-ts(MeanTemperatureByMonth,start=c(2011,1),end=c(2013,8), fre=12)
+test
+plot(training,ylab='MeanTemperatureByMonth')
